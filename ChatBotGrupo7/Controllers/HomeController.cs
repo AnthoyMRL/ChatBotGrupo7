@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
 using ChatBotGrupo7.Models;
+using ChatBotGrupo7.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatBotGrupo7.Controllers
@@ -13,9 +15,13 @@ namespace ChatBotGrupo7.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            GeminiRepository repo = new GeminiRepository();
+            string response = await repo.GetChatbotResponse("Dame un resumen de 100 palabras de la pelicula Titanic");
+
             return View();
+
         }
 
         public IActionResult Privacy()
