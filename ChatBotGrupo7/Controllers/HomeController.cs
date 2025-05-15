@@ -20,6 +20,8 @@ namespace ChatBotGrupo7.Controllers
             GeminiRepository repo = new GeminiRepository();
             string response = await repo.GetChatbotResponse("Dame un resumen de 100 palabras de la pelicula Titanic");
 
+            ViewBag.chatbotAnswer = response;
+
             return View();
 
         }
