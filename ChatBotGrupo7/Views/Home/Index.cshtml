@@ -1,11 +1,141 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿﻿@{
+    ViewData["Title"] = "Inicio";
+
+    var miembros = new[]
+    {
+        new { Nombre = "Anthony Morales", Correo = "anthony.morales.velez@udla.edu.ec", Intereses = "Videojuegos, frontend", Color = "#F4A261" },
+        new { Nombre = "Roberto Manosalvas", Correo = "roberto.manosalvas@udla.edu.ec", Intereses = "Desarrollo Web, Videojuegos", Color = "#2A9D8F" },
+        new { Nombre = "Thais Rojas", Correo = "thais.rojas@udla.edu.ec", Intereses = "Backend, APIs", Color = "#E76F51" },
+    };
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    body {
+        background-image: url('https://img.freepik.com/foto-gratis/fondo-oscuro-abstracto_1048-1920.jpg?semt=ais_hybrid&w=740');
+        background-size: cover;
+        background-attachment: fixed;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #fff;
+    }
 
-    <br /><><br/>
-    <p>@ViewBag.chatbotAnswer</p>
+    .glass {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    }
+
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        color: #fff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+        .form-control::placeholder {
+            color: #ccc;
+        }
+
+    .btn-info {
+        background-color: #00bcd4 !important;
+        border: none;
+    }
+
+    .chat-bubble {
+        padding: 1rem;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+
+    footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .miembro-foto {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        border: 2px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+</style>
+
+
+<div class="container my-5 text-center text-white">
+    <h1 class="display-6 fw-bold mb-3">¿Cómo podemos asistirte hoy?</h1>
+    <p class="mb-4">Haz tu consulta al asistente inteligente del grupo.</p>
+
+    <div class="chat-window glass p-4 mb-5" id="chatWindow" style="height: 400px; overflow-y: auto;">
+        @if (ViewBag.ChatHistory != null)
+        {
+            foreach (var message in ViewBag.ChatHistory)
+            {
+                <div class="mb-4">
+                    <div class="d-flex justify-content-start">
+                        <div class="chat-bubble text-start">
+                            <small class="fw-bold text-uppercase">Tú</small>
+                            <div>@message.UserPrompt</div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="chat-bubble text-start bg-secondary bg-opacity-75">
+                            <small class="fw-bold text-uppercase">@message.Provider</small>
+                            <div>@Html.Raw(message.BotResponse)</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">Aún no hay mensajes en el chat.</p>
+        }
+    </div>
+
+    <form asp-action="SendPrompt" method="post" class="row g-3 justify-content-center align-items-center">
+        <div class="col-12 col-md-3">
+            <select name="provider" class="form-select shadow">
+                <option value="Gemini">Gemini</option>
+                <option value="Groq">Groq</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-6">
+            <input type="text" name="promptUser" class="form-control shadow" placeholder="Escribe tu pregunta aquí..." required />
+        </div>
+        <div class="col-12 col-md-2 d-grid">
+            <button type="submit" class="btn btn-info shadow text-dark fw-bold">Enviar</button>
+        </div>
+    </form>
 </div>
+
+<footer class="glass text-white py-5 mt-5">
+    <div class="container">
+        <h6 class="text-center mb-4">Equipo desarrollador</h6>
+        <div class="row justify-content-center text-center g-4">
+            @foreach (var miembro in miembros)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="miembro-foto mb-2" style="background-color: @miembro.Color;">
+                            <i class="bi bi-person-fill fs-3 text-white d-flex align-items-center justify-content-center" style="height: 100%;"></i>
+                        </div>
+                        <p class="mb-0 fw-semibold">@miembro.Nombre</p>
+                        <p class="mb-0 small text-light">@miembro.Correo</p>
+                        <p class="mb-0 small"><em>@miembro.Intereses</em></p>
+                    </div>
+                </div>
+            }
+        </div>
+        <p class="text-center text-light mt-4 small">© 2025 — Chatbot Grupo7</p>
+    </div>
+</footer>
+
+<script>
+    const chatWindow = document.getElementById("chatWindow");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+</script>

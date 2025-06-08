@@ -8,17 +8,14 @@ namespace ChatBotGrupo7.Repository
     public class GeminiRepository : IChatBotService
     {
         private HttpClient _httpClient;
-        private string geminiApiKey = "AIzaSyATksFNyjGqbmkp3WXQTmBEvJYe_gKpLrg";
-
+        private string geminiApiKey = "AIzaSyBZFA1dpLS1DejGK4otzvJCCmf1dgSn6SI";
         public GeminiRepository()
         {
             _httpClient = new HttpClient();
         }
-
-        public async Task<string> GetChatbotResponse(string prompt)
+        public async Task<string> GetChatbotResponseAsync(string prompt)
         {
-            string url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +geminiApiKey;
-            
+            string url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + geminiApiKey;
             GeminiRequest request = new GeminiRequest
             {
                 contents = new List<GeminiContent>
@@ -35,23 +32,27 @@ namespace ChatBotGrupo7.Repository
                     }
                 }
             };
-
-            string requestJson = JsonConvert.SerializeObject(request);
+            string requestJson = JsonConvert.SerializeObject(request); // Serializar el objeto a JSON
             var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
-            
+
             var response = await _httpClient.PostAsync(url, content);
-            
 
-            var answer = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Error en la solicitud: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
 
-            return answer;
+            var answer = await response.Content.ReadFromJsonAsync<GeminiResponse>();
+
+            var responseText = answer.candidates
+                        .SelectMany(candidate => candidate.content.parts)
+                        .Select(part => part.text)
+                        .FirstOrDefault() ?? "No se pudo obtener respuesta del chatbot.";
+
+            return responseText;
         }
 
-        public Task<bool> SaveResponseInDatabase(string response)
+        public Task<bool> SaveResponseInDatabase(string chatbotPrompt, string chatBotResponse)
         {
             throw new NotImplementedException();
         }
     }
-
-
 }
